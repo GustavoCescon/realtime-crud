@@ -25,3 +25,7 @@ class UserRepository:
 
     def get_all(self) -> list[User]:
         return User.query.order_by(User.created_at.desc()).all()
+
+    def delete(self, user: User) -> None:
+        db.session.delete(user)
+        db.session.commit()

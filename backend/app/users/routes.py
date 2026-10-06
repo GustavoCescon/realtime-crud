@@ -84,3 +84,8 @@ def get_user(user_id: UUID):
     return jsonify(serialize_user(user))
 
 
+@users_bp.delete("/<uuid:user_id>")
+def delete_user(user_id: UUID):
+    service.delete(user_id)
+
+    return "", 204

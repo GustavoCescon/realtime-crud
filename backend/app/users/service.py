@@ -74,3 +74,11 @@ class UserService:
             raise UserNotFoundError()
 
         return user
+
+    def delete(self, user_id: UUID) -> None:
+        user = self.repository.get_by_id(user_id)
+
+        if not user:
+            raise UserNotFoundError()
+
+        self.repository.delete(user)
