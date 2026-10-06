@@ -67,3 +67,14 @@ class UserService:
             setattr(user, field, value)
 
         return self.repository.update(user)
+
+    def get_all(self) -> list[User]:
+        return self.repository.get_all()
+
+    def get_by_id(self, user_id: UUID) -> User:
+        user = self.repository.get_by_id(user_id)
+
+        if not user:
+            raise UserNotFoundError()
+
+        return user

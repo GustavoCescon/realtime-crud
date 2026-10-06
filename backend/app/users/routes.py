@@ -89,3 +89,25 @@ def update_user(user_id: UUID):
         return jsonify({
             "error": "user_not_found",
         }), 404
+
+@users_bp.get("")
+def get_users():
+    users = service.get_all()
+
+    return jsonify([
+        serialize_user(user)
+        for user in users
+    ])
+
+
+@users_bp.get("/<uuid:user_id>")
+def get_user(user_id: UUID):
+    try:
+        user = service.get_by_id(user_id)
+
+        return jsonify(serialize_user(user))
+
+    except UserNotFoundError:
+        return jsonify({
+            "error": "user_not_found",
+        }), 404

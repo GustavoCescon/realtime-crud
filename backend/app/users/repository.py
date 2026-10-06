@@ -22,3 +22,6 @@ class UserRepository:
         db.session.commit()
 
         return user
+
+    def get_all(self) -> list[User]:
+        return User.query.order_by(User.created_at.desc()).all()
