@@ -9,14 +9,10 @@ from app.users.schemas import (
     UpdateUserRequest,
 )
 
-
-class UserAlreadyExistsError(Exception):
-    pass
-
-
-class UserNotFoundError(Exception):
-    pass
-
+from app.common.exceptions import (
+    UserAlreadyExistsError,
+    UserNotFoundError,
+)
 
 class UserService:
 

@@ -36,59 +36,35 @@ def serialize_user(user):
 
 @users_bp.post("")
 def create_user():
-    try:
-        data = CreateUserRequest.model_validate(
-            request.get_json()
-        )
 
-        user = service.create(data)
+    data = CreateUserRequest.model_validate(
+        request.get_json()
+    )
 
-        return jsonify(
-            serialize_user(user)
-        ), 201
+    user = service.create(data)
 
-    except ValidationError as error:
-        return jsonify({
-            "error": "validation_error",
-            "details": error.errors(
-                include_url=False
-            ),
-        }), 422
-
-    except UserAlreadyExistsError:
-        return jsonify({
-            "error": "email_already_exists",
-        }), 409
+    return jsonify(
+        serialize_user(user)
+    ), 201
 
 
 @users_bp.patch("/<uuid:user_id>")
 def update_user(user_id: UUID):
-    try:
-        data = UpdateUserRequest.model_validate(
-            request.get_json()
-        )
 
-        user = service.update(
-            user_id,
-            data,
-        )
+    data = UpdateUserRequest.model_validate(
+        request.get_json()
+    )
 
-        return jsonify(
-            serialize_user(user)
-        )
+    user = service.update(
+        user_id,
+        data,
+    )
 
-    except ValidationError as error:
-        return jsonify({
-            "error": "validation_error",
-            "details": error.errors(
-                include_url=False
-            ),
-        }), 422
+    return jsonify(
+        serialize_user(user)
+    )
 
-    except UserNotFoundError:
-        return jsonify({
-            "error": "user_not_found",
-        }), 404
+
 
 @users_bp.get("")
 def get_users():
@@ -102,12 +78,9 @@ def get_users():
 
 @users_bp.get("/<uuid:user_id>")
 def get_user(user_id: UUID):
-    try:
-        user = service.get_by_id(user_id)
 
-        return jsonify(serialize_user(user))
+    user = service.get_by_id(user_id)
 
-    except UserNotFoundError:
-        return jsonify({
-            "error": "user_not_found",
-        }), 404
+    return jsonify(serialize_user(user))
+
+

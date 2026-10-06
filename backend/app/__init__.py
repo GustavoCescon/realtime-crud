@@ -5,6 +5,7 @@ from app.config import Config
 from app.extensions import db, migrate, jwt, socketio
 import app.extensions as extensions
 
+from app.common.error_handlers import register_error_handlers
 
 def create_app() -> Flask:
     app = Flask(__name__)
@@ -29,6 +30,7 @@ def create_app() -> Flask:
     )
 
     register_blueprints(app)
+    register_error_handlers(app)
 
     return app
 
