@@ -36,7 +36,13 @@ def create_app() -> Flask:
 
 
 def register_blueprints(app: Flask) -> None:
+    from app.auth.routes import auth_bp
     from app.users.routes import users_bp
+
+    app.register_blueprint(
+        auth_bp,
+        url_prefix="/api/v1/auth",
+    )
 
     app.register_blueprint(
         users_bp,
