@@ -3,6 +3,7 @@ from flask_jwt_extended import (
     get_jwt_identity,
     jwt_required,
     set_refresh_cookies,
+    unset_jwt_cookies,
 )
 from app.auth.schemas import LoginRequest
 from app.auth.service import AuthService
@@ -65,3 +66,13 @@ def refresh():
     return jsonify({
         "access_token": access_token,
     })
+
+@auth_bp.post("/logout")
+def logout():
+    response = jsonify({
+        "message": "logged_out",
+    })
+
+    unset_jwt_cookies(response)
+
+    return response
