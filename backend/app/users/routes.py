@@ -1,0 +1,91 @@
+from uuid import UUID
+
+from flask import Blueprint, jsonify, request
+from pydantic import ValidationError
+
+from app.users.repository import UserRepository
+from app.users.schemas import (
+    CreateUserRequest,
+    UpdateUserRequest,
+)
+from app.users.service import (
+    UserAlreadyExistsError,
+    UserNotFoundError,
+    UserService,
+)
+
+
+users_bp = Blueprint(
+    "users",
+    __name__,
+)
+
+repository = UserRepository()
+service = UserService(repository)
+
+
+def serialize_user(user):
+    return {
+        "id": str(user.id),
+        "name": user.name,
+        "email": user.email,
+        "role": user.role,
+        "is_active": user.is_active,
+    }
+
+
+@users_bp.post("")
+def create_user():
+    try:
+        data = CreateUserRequest.model_validate(
+            request.get_json()
+        )
+
+        user = service.create(data)
+
+        return jsonify(
+            serialize_user(user)
+        ), 201
+
+    except ValidationError as error:
+        return jsonify({
+            "error": "validation_error",
+            "details": error.errors(
+                include_url=False
+            ),
+        }), 422
+
+    except UserAlreadyExistsError:
+        return jsonify({
+            "error": "email_already_exists",
+        }), 409
+
+
+@users_bp.patch("/<uuid:user_id>")
+def update_user(user_id: UUID):
+    try:
+        data = UpdateUserRequest.model_validate(
+            request.get_json()
+        )
+
+        user = service.update(
+            user_id,
+            data,
+        )
+
+        return jsonify(
+            serialize_user(user)
+        )
+
+    except ValidationError as error:
+        return jsonify({
+            "error": "validation_error",
+            "details": error.errors(
+                include_url=False
+            ),
+        }), 422
+
+    except UserNotFoundError:
+        return jsonify({
+            "error": "user_not_found",
+        }), 404

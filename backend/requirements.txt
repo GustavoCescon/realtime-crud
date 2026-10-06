@@ -1,0 +1,11 @@
+Flask
+Flask-SQLAlchemy
+Flask-Migrate
+Flask-JWT-Extended
+Flask-SocketIO
+flask-cors
+psycopg[binary]
+redis
+pydantic[email]
+python-dotenv
+gunicorn
