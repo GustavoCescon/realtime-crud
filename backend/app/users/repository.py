@@ -3,7 +3,6 @@ from uuid import UUID
 from app.extensions import db
 from app.users.models import User
 
-
 class UserRepository:
 
     def get_by_id(self, user_id: UUID) -> User | None:
@@ -22,3 +21,10 @@ class UserRepository:
         db.session.commit()
 
         return user
+
+    def get_all(self) -> list[User]:
+        return User.query.order_by(User.created_at.desc()).all()
+
+    def delete(self, user: User) -> None:
+        db.session.delete(user)
+        db.session.commit()

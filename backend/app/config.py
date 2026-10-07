@@ -16,4 +16,13 @@ class Config:
         seconds=int(os.getenv("JWT_REFRESH_TOKEN_EXPIRES", "604800"))
     )
 
+    JWT_TOKEN_LOCATION = ["headers", "cookies"]
+
+    JWT_REFRESH_COOKIE_NAME = "refresh_token"
+    JWT_REFRESH_COOKIE_PATH = "/api/v1/auth/refresh"
+
+    JWT_COOKIE_SECURE = False
+    JWT_COOKIE_SAMESITE = "Lax"
+    JWT_COOKIE_CSRF_PROTECT = False
+
     REDIS_URL = os.environ["REDIS_URL"]

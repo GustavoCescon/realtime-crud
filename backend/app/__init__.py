@@ -5,6 +5,7 @@ from app.config import Config
 from app.extensions import db, migrate, jwt, socketio
 import app.extensions as extensions
 
+from app.common.error_handlers import register_error_handlers
 
 def create_app() -> Flask:
     app = Flask(__name__)
@@ -29,12 +30,19 @@ def create_app() -> Flask:
     )
 
     register_blueprints(app)
+    register_error_handlers(app)
 
     return app
 
 
 def register_blueprints(app: Flask) -> None:
+    from app.auth.routes import auth_bp
     from app.users.routes import users_bp
+
+    app.register_blueprint(
+        auth_bp,
+        url_prefix="/api/v1/auth",
+    )
 
     app.register_blueprint(
         users_bp,

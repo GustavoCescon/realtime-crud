@@ -1,6 +1,8 @@
 from uuid import UUID
 
 from flask import Blueprint, jsonify, request
+from flask_jwt_extended import get_jwt, get_jwt_identity, jwt_required
+
 from pydantic import ValidationError
 
 from app.users.repository import UserRepository
@@ -13,7 +15,10 @@ from app.users.service import (
     UserNotFoundError,
     UserService,
 )
-
+from app.common.decorators import (
+    owner_or_roles_required,
+    roles_required,
+)
 
 users_bp = Blueprint(
     "users",
@@ -22,7 +27,6 @@ users_bp = Blueprint(
 
 repository = UserRepository()
 service = UserService(repository)
-
 
 def serialize_user(user):
     return {
@@ -33,59 +37,61 @@ def serialize_user(user):
         "is_active": user.is_active,
     }
 
-
 @users_bp.post("")
 def create_user():
-    try:
-        data = CreateUserRequest.model_validate(
-            request.get_json()
-        )
 
-        user = service.create(data)
+    data = CreateUserRequest.model_validate(
+        request.get_json()
+    )
 
-        return jsonify(
-            serialize_user(user)
-        ), 201
+    user = service.create(data)
 
-    except ValidationError as error:
-        return jsonify({
-            "error": "validation_error",
-            "details": error.errors(
-                include_url=False
-            ),
-        }), 422
-
-    except UserAlreadyExistsError:
-        return jsonify({
-            "error": "email_already_exists",
-        }), 409
-
+    return jsonify(
+        serialize_user(user)
+    ), 201
 
 @users_bp.patch("/<uuid:user_id>")
+@jwt_required()
+@owner_or_roles_required("admin")
 def update_user(user_id: UUID):
-    try:
-        data = UpdateUserRequest.model_validate(
-            request.get_json()
-        )
 
-        user = service.update(
-            user_id,
-            data,
-        )
+    data = UpdateUserRequest.model_validate(
+        request.get_json()
+    )
 
-        return jsonify(
-            serialize_user(user)
-        )
+    user = service.update(
+        user_id,
+        data,
+    )
 
-    except ValidationError as error:
-        return jsonify({
-            "error": "validation_error",
-            "details": error.errors(
-                include_url=False
-            ),
-        }), 422
+    return jsonify(
+        serialize_user(user)
+    )
 
-    except UserNotFoundError:
-        return jsonify({
-            "error": "user_not_found",
-        }), 404
+@users_bp.get("")
+@jwt_required()
+@roles_required("admin")
+def get_users():
+    users = service.get_all()
+
+    return jsonify([
+        serialize_user(user)
+        for user in users
+    ])
+
+
+@users_bp.get("/<uuid:user_id>")
+@jwt_required()
+@owner_or_roles_required("admin")
+def get_user(user_id: UUID):
+    user = service.get_by_id(user_id)
+
+    return jsonify(serialize_user(user))
+
+@users_bp.delete("/<uuid:user_id>")
+@jwt_required()
+@roles_required("admin")
+def delete_user(user_id: UUID):
+    service.delete(user_id)
+
+    return "", 204

@@ -9,14 +9,10 @@ from app.users.schemas import (
     UpdateUserRequest,
 )
 
-
-class UserAlreadyExistsError(Exception):
-    pass
-
-
-class UserNotFoundError(Exception):
-    pass
-
+from app.common.exceptions import (
+    UserAlreadyExistsError,
+    UserNotFoundError,
+)
 
 class UserService:
 
@@ -67,3 +63,22 @@ class UserService:
             setattr(user, field, value)
 
         return self.repository.update(user)
+
+    def get_all(self) -> list[User]:
+        return self.repository.get_all()
+
+    def get_by_id(self, user_id: UUID) -> User:
+        user = self.repository.get_by_id(user_id)
+
+        if not user:
+            raise UserNotFoundError()
+
+        return user
+
+    def delete(self, user_id: UUID) -> None:
+        user = self.repository.get_by_id(user_id)
+
+        if not user:
+            raise UserNotFoundError()
+
+        self.repository.delete(user)
