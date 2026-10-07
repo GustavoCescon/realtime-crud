@@ -7,10 +7,13 @@ import app.extensions as extensions
 
 from app.common.error_handlers import register_error_handlers
 
-def create_app() -> Flask:
+def create_app(test_config: dict | None = None) -> Flask:
     app = Flask(__name__)
 
     app.config.from_object(Config)
+
+    if test_config:
+        app.config.update(test_config)
 
     db.init_app(app)
 

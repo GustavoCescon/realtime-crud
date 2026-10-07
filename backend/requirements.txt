@@ -9,3 +9,4 @@ redis
 pydantic[email]
 python-dotenv
 gunicorn
+pytest
