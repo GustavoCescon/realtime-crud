@@ -17,3 +17,7 @@ class UserAlreadyExistsError(AppError):
 class InvalidCredentialsError(AppError):
     status_code = 401
     error_code = "invalid_credentials"
+
+class InactiveUserError(AppError):
+    status_code = 403
+    error_code = "inactive_user"

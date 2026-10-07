@@ -8,6 +8,7 @@ from flask_jwt_extended import (
 from werkzeug.security import check_password_hash
 
 from app.common.exceptions import (
+    InactiveUserError,
     InvalidCredentialsError,
     UserNotFoundError,
 )
@@ -27,6 +28,9 @@ class AuthService:
 
         if not check_password_hash(user.password_hash, password):
             raise InvalidCredentialsError()
+
+        if not user.is_active:
+            raise InactiveUserError()
 
         return user
 
@@ -48,5 +52,8 @@ class AuthService:
 
         if not user:
             raise UserNotFoundError()
+
+        if not user.is_active:
+            raise InactiveUserError()
 
         return user
