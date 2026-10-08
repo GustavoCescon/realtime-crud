@@ -183,3 +183,4 @@ def test_regular_user_cannot_delete_user(client, user, auth_headers):
     saved_user = db.session.get(User, UUID(user["id"]))
 
     assert saved_user is not None
+ 
