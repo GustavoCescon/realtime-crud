@@ -33,7 +33,7 @@ jobs:
 
       - name: Run tests
         env:
-          DATABASE_URL: sqlite:///:memory:
-          REDIS_URL: redis://localhost:6379/0
-          JWT_SECRET_KEY: ci-only-secret-key-at-least-32-bytes-long
+          DATABASE_URL: "sqlite:///:memory:"
+          REDIS_URL: "redis://localhost:6379/0"
+          JWT_SECRET_KEY: "ci-only-secret-key-at-least-32-bytes-long"
         run: python -m pytest -v
