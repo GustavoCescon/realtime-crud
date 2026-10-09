@@ -1,4 +1,4 @@
-from flask import Flask
+from flask import Flask, jsonify
 from redis import Redis
 
 from app.config import Config
@@ -6,6 +6,7 @@ from app.extensions import db, migrate, jwt, socketio
 import app.extensions as extensions
 
 from app.common.error_handlers import register_error_handlers
+
 
 def create_app(test_config: dict | None = None) -> Flask:
     app = Flask(__name__)
@@ -21,6 +22,15 @@ def create_app(test_config: dict | None = None) -> Flask:
 
     migrate.init_app(app, db)
     jwt.init_app(app)
+
+    @jwt.expired_token_loader
+    def expired_token_callback(jwt_header, jwt_payload):
+        return jsonify(
+            {
+                "code": "TOKEN_EXPIRED",
+                "message": "Token has expired",
+            }
+        ), 401
 
     socketio.init_app(
         app,
